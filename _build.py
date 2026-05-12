@@ -1,0 +1,845 @@
+#!/usr/bin/env python3
+"""
+KREVZONE.cz — build script.
+
+Reads all rozbory/*/manifest.json and renders:
+  - index.html                       (homepage with all weekly batches)
+  - rozbory/index.html               (archive of all weeks)
+  - rozbory/<date>/index.html        (per-week overview page)
+  - filmy/<slug>.html                (detail page per unique film)
+
+Usage:
+  python3 _build.py
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from datetime import date as Date
+
+ROOT = Path(__file__).parent
+ROZBORY_DIR = ROOT / "rozbory"
+FILMY_DIR = ROOT / "filmy"
+
+# ============================================================================
+# CSS — shared across all pages, inlined into every HTML output
+# ============================================================================
+
+CSS = """
+:root{
+  --bg-void:#0a0612; --bg-base:#120a1f; --bg-surface:#1a1029; --bg-elevated:#241638;
+  --purple-deep:#2d1b4e; --purple-mid:#5b2d8a; --purple-primary:#8b3fbf;
+  --purple-glow:#b465e8; --purple-mist:#d4a3f5;
+  --blood:#8b1538; --blood-bright:#c41e3a; --blood-glow:#ff2d55;
+  --text-primary:#f4ecff; --text-body:#d8c9ee; --text-muted:#9a86b8; --text-faint:#5d4f7a;
+  --border:rgba(139,63,191,0.18); --border-strong:rgba(139,63,191,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-body);font-family:'Inter',system-ui,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.25 0 0 0 0 0.75 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.08;mix-blend-mode:overlay}
+
+/* ====== UTILITY BAR + HEADER ====== */
+.utility-bar{background:var(--bg-void);border-bottom:1px solid var(--border);padding:10px 32px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text-faint);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.utility-bar a{color:var(--text-muted);transition:color 0.2s}
+.utility-bar a:hover{color:var(--purple-glow)}
+.utility-bar-left,.utility-bar-right{display:flex;gap:20px;flex-wrap:wrap}
+.live-dot{color:var(--blood-bright);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(10,6,18,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1400px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.logo{font-family:'Cinzel',serif;font-weight:800;font-size:24px;letter-spacing:0.08em;color:var(--text-primary);display:flex;align-items:center;gap:10px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--purple-glow),var(--blood) 70%);box-shadow:0 0 16px var(--purple-glow)}
+.logo b{background:linear-gradient(180deg,var(--purple-glow),var(--blood-bright));-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:500}
+.nav-menu{display:flex;gap:4px;list-style:none;flex-wrap:wrap}
+.nav-menu a{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;padding:8px 14px;color:var(--text-body);border-radius:6px;transition:all 0.2s}
+.nav-menu a:hover{background:rgba(139,63,191,0.15);color:var(--purple-glow)}
+.nav-menu a.active{background:var(--purple-deep);color:var(--text-primary)}
+.nav-cta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:10px 16px;background:var(--blood);color:var(--text-primary);border-radius:100px;transition:all 0.2s}
+.nav-cta:hover{background:var(--blood-bright);box-shadow:0 0 24px rgba(196,30,58,0.5)}
+
+/* ====== HERO ====== */
+.hero{position:relative;min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;overflow:hidden;background:radial-gradient(ellipse 80% 50% at 50% 30%,rgba(139,63,191,0.28),transparent 70%),radial-gradient(ellipse 60% 40% at 30% 80%,rgba(139,21,56,0.18),transparent 70%),radial-gradient(ellipse 70% 50% at 80% 60%,rgba(91,45,138,0.22),transparent 70%),var(--bg-void)}
+.hero::before{content:'';position:absolute;inset:-20%;z-index:0;background:radial-gradient(circle at 20% 30%,rgba(180,101,232,0.08),transparent 40%),radial-gradient(circle at 70% 70%,rgba(139,63,191,0.06),transparent 40%);animation:mist 20s ease-in-out infinite alternate}
+@keyframes mist{0%{transform:translate(0,0) scale(1)}50%{transform:translate(2%,-2%) scale(1.05)}100%{transform:translate(-2%,2%) scale(1)}}
+.hero-content{position:relative;z-index:2;max-width:920px;animation:fadeUp 1.5s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.5em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:32px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'—';margin:0 16px;color:var(--text-faint)}
+.hero-title{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(56px,11vw,144px);line-height:0.95;color:var(--text-primary);letter-spacing:0.02em;margin-bottom:32px;text-shadow:0 0 40px rgba(139,63,191,0.5),0 0 80px rgba(139,63,191,0.3)}
+.hero-title .accent{color:transparent;background:linear-gradient(180deg,var(--purple-glow) 0%,var(--purple-primary) 70%,var(--blood) 100%);-webkit-background-clip:text;background-clip:text;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:500}
+.hero-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(20px,2.5vw,28px);color:var(--text-body);margin:0 auto 48px;max-width:620px;line-height:1.4}
+.hero-cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border-radius:100px;transition:all 0.3s}
+.hero-cta-primary{background:var(--blood);color:var(--text-primary);box-shadow:0 0 32px rgba(196,30,58,0.4)}
+.hero-cta-primary:hover{background:var(--blood-bright);transform:translateY(-2px);box-shadow:0 8px 40px rgba(196,30,58,0.6)}
+.hero-cta-ghost{background:rgba(26,16,41,0.6);border:1px solid var(--border-strong);color:var(--text-body);backdrop-filter:blur(8px)}
+.hero-cta-ghost:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+.hero-stats{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;padding:24px 32px;background:rgba(26,16,41,0.4);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(8px);max-width:760px;margin:0 auto}
+.hero-stat{text-align:center}
+.hero-stat-num{font-family:'Cinzel',serif;font-weight:700;font-size:36px;color:var(--purple-glow);line-height:1}
+.hero-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-top:8px}
+
+/* ====== SECTION GENERIC ====== */
+.container{max-width:1320px;margin:0 auto;padding:0 32px}
+section{padding:100px 0;position:relative}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:56px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:24px}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;display:block}
+.section-title{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(36px,5vw,56px);color:var(--text-primary);letter-spacing:0.02em;line-height:1.05}
+.section-title .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
+.section-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);max-width:420px;text-align:right;line-height:1.4}
+.section-link{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple-glow);padding:10px 18px;border:1px solid var(--border-strong);border-radius:100px;transition:all 0.2s;white-space:nowrap}
+.section-link:hover{background:rgba(139,63,191,0.15);border-color:var(--purple-glow)}
+
+/* ====== ROZBORY (weekly batches grid) ====== */
+.rozbory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:28px}
+.rozbor-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.3s;position:relative;display:flex;flex-direction:column}
+.rozbor-card:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:0 16px 56px rgba(139,63,191,0.18)}
+.rozbor-card-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--bg-void);height:240px}
+.rozbor-card-thumbs img{width:100%;height:100%;object-fit:cover}
+.rozbor-card-body{padding:24px;display:flex;flex-direction:column;gap:12px;flex:1}
+.rozbor-card-week{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--blood-bright)}
+.rozbor-card-title{font-family:'Cinzel',serif;font-weight:700;font-size:24px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.1}
+.rozbor-card-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--text-muted);line-height:1.4}
+.rozbor-card-meta{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint)}
+.rozbor-card-meta strong{color:var(--purple-glow)}
+
+/* ====== TOP 10 ====== */
+.top10{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.top10-row{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:20px;padding:24px 28px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:all 0.2s}
+.top10-row:nth-child(2n){border-right:none}
+.top10-row:hover{background:rgba(139,63,191,0.08);transform:translateX(4px)}
+.top10-rank{font-family:'Cinzel',serif;font-weight:800;font-size:56px;line-height:1;color:var(--purple-glow);-webkit-text-stroke:1px var(--purple-deep)}
+.top10-row:nth-child(-n+3) .top10-rank{background:linear-gradient(180deg,var(--purple-glow),var(--blood));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0}
+.top10-info h3{font-family:'Cinzel',serif;font-weight:600;font-size:18px;color:var(--text-primary);margin-bottom:6px;letter-spacing:0.02em}
+.top10-info p{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase}
+.top10-score{font-family:'Cinzel',serif;font-weight:700;font-size:24px;color:var(--text-primary);background:var(--bg-void);padding:10px 14px;border:1px solid var(--border-strong);border-radius:8px;min-width:64px;text-align:center}
+.top10-score small{display:block;font-size:10px;color:var(--text-faint);font-weight:400;margin-top:2px}
+
+/* ====== FILM CARDS ====== */
+.films-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:28px}
+.film-card{display:block;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.3s ease;position:relative}
+.film-card:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:0 16px 48px rgba(139,63,191,0.2)}
+.film-card-poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(135deg,var(--purple-deep),var(--bg-void))}
+.film-card-poster img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease}
+.film-card:hover .film-card-poster img{transform:scale(1.05)}
+.film-card-badge{position:absolute;top:14px;left:14px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;background:var(--blood);color:var(--text-primary);padding:6px 12px;border-radius:100px}
+.film-card-badge.purple{background:var(--purple-primary)}
+.film-card-rating{position:absolute;top:14px;right:14px;z-index:2;font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:var(--text-primary);background:rgba(10,6,18,0.85);padding:8px 12px;border-radius:8px;backdrop-filter:blur(8px);border:1px solid var(--border-strong)}
+.film-card-body{padding:20px}
+.film-card-genre{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px}
+.film-card-title{font-family:'Cinzel',serif;font-weight:600;font-size:20px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.2;margin-bottom:6px}
+.film-card-meta{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted)}
+
+/* ====== TRAILERY ====== */
+.trailers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:28px}
+.trailer-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.3s}
+.trailer-card:hover{border-color:var(--border-strong);box-shadow:0 12px 40px rgba(139,63,191,0.18)}
+.trailer-video{width:100%;aspect-ratio:16/9;background:#000;display:block}
+.trailer-placeholder{width:100%;aspect-ratio:16/9;display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);border-bottom:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--text-muted);text-align:center;padding:24px;line-height:1.4}
+.trailer-info{padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.trailer-info-title{font-family:'Cinzel',serif;font-weight:600;font-size:16px;color:var(--text-primary);letter-spacing:0.02em}
+.trailer-info-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;margin-top:4px}
+.trailer-detail-btn{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple-glow);padding:8px 12px;border:1px solid var(--border-strong);border-radius:100px;flex-shrink:0;transition:all 0.2s}
+.trailer-detail-btn:hover{background:rgba(139,63,191,0.15);border-color:var(--purple-glow)}
+
+/* ====== KALENDAR ====== */
+.kalendar{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.kalendar-row{display:grid;grid-template-columns:140px 1fr 1fr auto;align-items:center;gap:24px;padding:24px 28px;border-bottom:1px solid var(--border);transition:all 0.2s}
+.kalendar-row:last-child{border-bottom:none}
+.kalendar-row:hover{background:rgba(139,63,191,0.06);transform:translateX(4px)}
+.kalendar-date{font-family:'Cinzel',serif;font-weight:700;font-size:42px;line-height:0.95;color:var(--blood-bright)}
+.kalendar-date small{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;color:var(--text-muted);text-transform:uppercase;margin-top:6px;font-weight:400}
+.kalendar-title{font-family:'Cinzel',serif;font-weight:600;font-size:22px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.1}
+.kalendar-title small{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-top:6px;letter-spacing:0}
+.kalendar-desc{font-size:14px;color:var(--text-body);line-height:1.5}
+.kalendar-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:8px 14px;border-radius:100px;white-space:nowrap}
+.kalendar-badge.kina{background:var(--blood);color:var(--text-primary)}
+.kalendar-badge.stream{background:var(--purple-primary);color:var(--text-primary)}
+.kalendar-badge.upcoming{background:transparent;border:1px solid var(--purple-glow);color:var(--purple-glow)}
+
+/* ====== FOOTER ====== */
+.footer{background:var(--bg-void);border-top:1px solid var(--border);padding:80px 32px 32px;margin-top:80px}
+.footer-inner{max-width:1320px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand{font-family:'Cinzel',serif;font-weight:800;font-size:32px;color:var(--text-primary);letter-spacing:0.06em;margin-bottom:14px}
+.footer-brand b{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;background:linear-gradient(180deg,var(--purple-glow),var(--blood));-webkit-background-clip:text;background-clip:text;color:transparent}
+.footer-about{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text-muted);line-height:1.6;max-width:380px}
+.footer h4{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:18px}
+.footer ul{list-style:none}
+.footer li{margin-bottom:10px}
+.footer ul a{font-family:'Inter',sans-serif;font-size:14px;color:var(--text-body);transition:color 0.2s}
+.footer ul a:hover{color:var(--purple-glow)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text-faint);text-transform:uppercase}
+
+/* ====== FILM DETAIL ====== */
+.breadcrumb{padding:32px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted)}
+.breadcrumb a{color:var(--purple-glow)}
+.breadcrumb-sep{color:var(--text-faint);margin:0 10px}
+.film-hero{display:grid;grid-template-columns:380px 1fr;gap:64px;padding:60px 0 80px;border-bottom:1px solid var(--border)}
+.film-hero-poster{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 80px rgba(139,63,191,0.2);border:1px solid var(--border-strong)}
+.film-hero-poster img{width:100%;display:block;aspect-ratio:2/3;object-fit:cover}
+.film-hero-info{padding-top:20px}
+.film-genre{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:16px}
+.film-title-big{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(48px,7vw,96px);line-height:0.95;color:var(--text-primary);letter-spacing:0.02em;margin-bottom:12px;text-shadow:0 0 40px rgba(139,63,191,0.4)}
+.film-orig{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--text-muted);margin-bottom:32px}
+.film-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;margin-bottom:32px}
+.film-stat{background:var(--bg-surface);padding:18px 20px}
+.film-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.film-stat-value{font-family:'Cinzel',serif;font-weight:600;font-size:18px;color:var(--text-primary);line-height:1.2}
+.film-stat-value.rating{font-size:28px;color:var(--purple-glow)}
+.film-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.film-tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border-strong);border-radius:100px;color:var(--text-body)}
+.film-actions{display:flex;gap:12px;flex-wrap:wrap}
+.film-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border-radius:100px;transition:all 0.2s}
+.film-btn-primary{background:var(--blood);color:var(--text-primary)}
+.film-btn-primary:hover{background:var(--blood-bright);box-shadow:0 0 24px rgba(196,30,58,0.5)}
+.film-btn-ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text-body)}
+.film-btn-ghost:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+
+.film-section{padding:80px 0;border-bottom:1px solid var(--border)}
+.film-section-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;display:block}
+.film-section h2{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(32px,4vw,52px);color:var(--text-primary);letter-spacing:0.02em;line-height:1.05;margin-bottom:28px}
+.film-section h2 .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
+.film-section p{font-family:'Inter',sans-serif;font-size:17px;line-height:1.75;color:var(--text-body);margin-bottom:18px;max-width:780px}
+.trailer-block{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid var(--border-strong)}
+.trailer-block video{width:100%;height:100%;display:block}
+.trailer-block.empty{display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);text-align:center;padding:40px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--text-muted);line-height:1.4}
+.pullquote{margin:40px 0;padding:32px 40px;border-left:3px solid var(--blood-bright);background:linear-gradient(90deg,rgba(139,21,56,0.08),transparent);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;line-height:1.4;color:var(--text-primary);max-width:820px}
+.review-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:16px;padding:40px;position:relative;margin-top:24px}
+.review-box::before{content:'REC';position:absolute;top:-12px;left:32px;background:var(--blood);color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;padding:4px 12px;border-radius:6px}
+.review-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.review-rating-big{font-family:'Cinzel',serif;font-weight:700;font-size:64px;color:var(--purple-glow);line-height:1}
+.review-rating-big small{display:block;font-size:13px;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-weight:400}
+.review-stars{font-family:monospace;font-size:24px;letter-spacing:6px;color:var(--blood-bright)}
+.review-text{font-family:'Inter',sans-serif;font-size:16px;line-height:1.75;color:var(--text-body)}
+.review-author{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint)}
+.cast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.cast-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:20px;transition:all 0.2s}
+.cast-card:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cast-name{font-family:'Cinzel',serif;font-weight:600;font-size:16px;color:var(--text-primary);margin-bottom:6px;letter-spacing:0.02em}
+.cast-role{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--purple-glow)}
+.trivia-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.trivia-list li{padding:18px 24px;background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--purple-primary);border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;color:var(--text-body)}
+.back-link{display:inline-flex;align-items:center;gap:8px;margin:40px 0;padding:12px 20px;border:1px solid var(--border-strong);border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-body);transition:all 0.2s}
+.back-link:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+
+@media (max-width:960px){
+  .top10{grid-template-columns:1fr}
+  .top10-row{border-right:none !important}
+  .kalendar-row{grid-template-columns:80px 1fr;gap:12px}
+  .kalendar-desc,.kalendar-badge{grid-column:span 2}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .film-hero{grid-template-columns:1fr;gap:32px}
+  .film-hero-poster{max-width:320px;margin:0 auto}
+}
+@media (max-width:640px){
+  .hero{min-height:auto;padding:60px 20px}
+  section{padding:60px 0}
+  .container{padding:0 20px}
+  .footer-grid{grid-template-columns:1fr}
+}
+"""
+
+# ============================================================================
+# PARTIAL TEMPLATES
+# ============================================================================
+
+def utility_bar(week_label: str) -> str:
+    return f"""<div class="utility-bar">
+  <div class="utility-bar-left">
+    <span><span class="live-dot">●</span> {week_label}</span>
+    <span>EDICE LIVE</span>
+  </div>
+  <div class="utility-bar-right">
+    <a href="#">Newsletter</a><a href="#">RSS</a><a href="#">Discord</a>
+  </div>
+</div>"""
+
+
+def header(active: str, root: str = ".") -> str:
+    items = [
+        ("top10", "Top 10"),
+        ("katalog", "Katalog"),
+        ("trailery", "Trailery"),
+        ("rozbory", "Rozbory"),
+        ("kalendar", "Premiéry"),
+    ]
+    def _link(slug, label):
+        cls = ' class="active"' if slug == active else ""
+        return f'<li><a href="{root}/index.html#{slug}"{cls}>{label}</a></li>'
+    menu = "\n      ".join(_link(slug, label) for slug, label in items)
+    return f"""<header class="header">
+  <div class="header-inner">
+    <a href="{root}/index.html" class="logo"><span class="logo-dot"></span>KREV<b>ZONE</b></a>
+    <ul class="nav-menu">
+      {menu}
+    </ul>
+    <a href="#newsletter" class="nav-cta">Newsletter →</a>
+  </div>
+</header>"""
+
+
+def footer() -> str:
+    return """<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">KREV<b>ZONE</b></div>
+        <p class="footer-about">Nezávislý český webový magazín o hororovém filmu. Recenze bez kompromisů, žebříčky bez clickbaitu, eseje bez vaty. Praut s.r.o., 2026.</p>
+      </div>
+      <div>
+        <h4>Sekce</h4>
+        <ul>
+          <li><a href="index.html#top10">Top 10</a></li>
+          <li><a href="index.html#katalog">Katalog</a></li>
+          <li><a href="index.html#trailery">Trailery</a></li>
+          <li><a href="index.html#rozbory">Týdenní rozbory</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Žánry</h4>
+        <ul>
+          <li><a href="#">Folk horror</a></li>
+          <li><a href="#">A24 horror</a></li>
+          <li><a href="#">Slasher</a></li>
+          <li><a href="#">Body horror</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Komunita</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RSS feed</a></li>
+          <li><a href="#">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 KREVZONE.cz · Praut s.r.o.</span>
+      <span>Auto-built · V1</span>
+    </div>
+  </div>
+</footer>"""
+
+
+def html_doc(title: str, body: str, description: str = "") -> str:
+    return f"""<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title}</title>
+<meta name="description" content="{description}">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0612'/><text x='50%25' y='65%25' text-anchor='middle' font-family='serif' font-weight='900' font-size='22' fill='%23b465e8'>K</text></svg>">
+<style>{CSS}</style>
+</head>
+<body>
+{body}
+</body>
+</html>
+"""
+
+
+# ============================================================================
+# PAGE RENDERERS
+# ============================================================================
+
+def render_film_card(film: dict, week: str, root: str = ".") -> str:
+    """Card linking to film detail (homepage / week page / katalog)."""
+    badge_class = " purple" if film["status"] == "stream" else ""
+    badge = {"kina": "V kinech", "stream": "Stream", "upcoming": "Brzy"}.get(film["status"], "")
+    poster_path = f"{root}/rozbory/{week}/posters/{film['poster']}"
+    return f"""<a href="{root}/filmy/{film['slug']}.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge{badge_class}">{badge}</span>
+    <span class="film-card-rating">{film['rating']}</span>
+    <img src="{poster_path}" alt="{film['title']}">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">{film['genre']} · {film['runtime']}</div>
+    <h3 class="film-card-title">{film['title']}</h3>
+    <div class="film-card-meta">{film['director']} · {film['year']}</div>
+  </div>
+</a>"""
+
+
+def render_trailer_card(film: dict, week: str, root: str = ".") -> str:
+    poster_path = f"{root}/rozbory/{week}/posters/{film['poster']}"
+    if film["trailer"]:
+        trailer_path = f"{root}/rozbory/{week}/trailers/{film['trailer']}"
+        body = f'<video class="trailer-video" controls preload="metadata" poster="{poster_path}"><source src="{trailer_path}" type="video/mp4"></video>'
+    else:
+        body = f'<div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra {film["premiere"]}.</div>'
+    return f"""<div class="trailer-card">
+  {body}
+  <div class="trailer-info">
+    <div>
+      <div class="trailer-info-title">{film['title']}</div>
+      <div class="trailer-info-meta">{film['studio']} · {film['premiere']}</div>
+    </div>
+    <a href="{root}/filmy/{film['slug']}.html" class="trailer-detail-btn">Detail →</a>
+  </div>
+</div>"""
+
+
+def render_rozbor_card(rozbor: dict, root: str = ".") -> str:
+    """Card for a weekly batch on the homepage."""
+    week = rozbor["week"]
+    # First 4 posters as thumbnails
+    thumbs = "\n      ".join(
+        f'<img src="{root}/rozbory/{week}/posters/{f["poster"]}" alt="{f["title"]}">'
+        for f in rozbor["films"][:4]
+    )
+    return f"""<a href="{root}/rozbory/{week}/index.html" class="rozbor-card">
+  <div class="rozbor-card-thumbs">
+    {thumbs}
+  </div>
+  <div class="rozbor-card-body">
+    <div class="rozbor-card-week">{rozbor['week_label']}</div>
+    <h3 class="rozbor-card-title">{rozbor['title']}</h3>
+    <div class="rozbor-card-sub">{rozbor['subtitle']}</div>
+    <div class="rozbor-card-meta">
+      <span><strong>{len(rozbor['films'])}</strong> filmů</span>
+      <span>Sestavil <strong>{rozbor['compiled_by']}</strong></span>
+    </div>
+  </div>
+</a>"""
+
+
+def render_kalendar_row(film: dict, week: str, root: str = ".") -> str:
+    badge_class = {"kina": "kina", "stream": "stream", "upcoming": "upcoming"}[film["status"]]
+    badge_text = {"kina": "V kinech", "stream": "Stream", "upcoming": "Chystá se"}[film["status"]]
+    # Extract day and month from premiere date
+    try:
+        d = Date.fromisoformat(film["premiere_date"])
+        months = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"]
+        day = f"{d.day:02d}"
+        month = months[d.month - 1]
+    except (KeyError, ValueError):
+        day = "—"; month = "—"
+    return f"""<a href="{root}/filmy/{film['slug']}.html" class="kalendar-row">
+  <div class="kalendar-date">{day}<small>{month}</small></div>
+  <div>
+    <div class="kalendar-title">{film['title']}<small>{film['director']} · {film['studio']} · {film['runtime']}</small></div>
+  </div>
+  <div class="kalendar-desc">{film['pullquote']}</div>
+  <span class="kalendar-badge {badge_class}">{badge_text}</span>
+</a>"""
+
+
+def render_top10_row(film: dict, rank: int, root: str = ".") -> str:
+    return f"""<a href="{root}/filmy/{film['slug']}.html" class="top10-row">
+  <div class="top10-rank">{rank:02d}</div>
+  <div class="top10-info">
+    <h3>{film['title']}</h3>
+    <p>{film['director']} · {film['year']} · {film['genre']}</p>
+  </div>
+  <div class="top10-score">{film['rating']}<small>/10</small></div>
+</a>"""
+
+
+# ============================================================================
+# FILM DETAIL PAGE
+# ============================================================================
+
+def render_film_detail(film: dict, week: str) -> str:
+    """Render a single film's detail page."""
+    poster_path = f"../rozbory/{week}/posters/{film['poster']}"
+    trailer_path = f"../rozbory/{week}/trailers/{film['trailer']}" if film['trailer'] else None
+    stars = "★" * film["stars"] + "☆" * (10 - film["stars"])
+
+    tags_html = "\n        ".join(f'<span class="film-tag">{t}</span>' for t in film["tags"])
+
+    actions = []
+    if film.get("youtube"):
+        actions.append(f'<a href="{film["youtube"]}" target="_blank" class="film-btn film-btn-primary">▶ Trailer na YouTube</a>')
+    if film.get("wiki"):
+        actions.append(f'<a href="{film["wiki"]}" target="_blank" class="film-btn film-btn-ghost">Wikipedia →</a>')
+    actions_html = "\n        ".join(actions)
+
+    if trailer_path:
+        trailer_block = f'<div class="trailer-block"><video controls preload="metadata" poster="{poster_path}"><source src="{trailer_path}" type="video/mp4"></video></div>'
+    else:
+        trailer_block = f'<div class="trailer-block empty">⌛ Oficiální trailer zatím nebyl vydán.<br>Premiéra {film["premiere"]}.</div>'
+
+    cast_html = "\n      ".join(
+        f'<div class="cast-card"><div class="cast-name">{name}</div><div class="cast-role">{role}</div></div>'
+        for name, role in film["cast"]
+    )
+
+    trivia_html = "\n      ".join(f'<li>{t}</li>' for t in film["trivia"])
+
+    body = f"""{utility_bar("Detail filmu")}
+{header("katalog", root="..")}
+
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="../index.html">Domů</a><span class="breadcrumb-sep">/</span>
+    <a href="../index.html#katalog">Katalog</a><span class="breadcrumb-sep">/</span>
+    <span>{film['title']}</span>
+  </nav>
+
+  <section class="film-hero">
+    <div class="film-hero-poster">
+      <img src="{poster_path}" alt="{film['title']}">
+    </div>
+    <div class="film-hero-info">
+      <div class="film-genre">{film['genre']}</div>
+      <h1 class="film-title-big">{film['title']}</h1>
+      <div class="film-orig">{film['orig']} · {film['country']}</div>
+
+      <div class="film-stats">
+        <div class="film-stat"><div class="film-stat-label">Hodnocení</div><div class="film-stat-value rating">{film['rating']}</div></div>
+        <div class="film-stat"><div class="film-stat-label">Stopáž</div><div class="film-stat-value">{film['runtime']}</div></div>
+        <div class="film-stat"><div class="film-stat-label">Premiéra</div><div class="film-stat-value">{film['premiere']}</div></div>
+        <div class="film-stat"><div class="film-stat-label">RT skóre</div><div class="film-stat-value">{film['rt_score']}</div></div>
+      </div>
+
+      <div class="film-tags">{tags_html}</div>
+      <div class="film-actions">{actions_html}</div>
+    </div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">01 · Trailer</span>
+    <h2>Oficiální <span class="accent">upoutávka</span></h2>
+    {trailer_block}
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">02 · Obsah</span>
+    <h2>O <span class="accent">čem</span> to je</h2>
+    <p>{film['synopsis']}</p>
+    <div class="pullquote">„{film['pullquote']}"</div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">03 · Recenze</span>
+    <h2>Verdikt <span class="accent">redakce</span></h2>
+    <div class="review-box">
+      <div class="review-header">
+        <div><div class="review-rating-big">{film['rating']}<small>{film['rating_label']}</small></div></div>
+        <div class="review-stars">{stars}</div>
+      </div>
+      <p class="review-text">{film['review']}</p>
+      <div class="review-author">Martin Š. · Redakce KREVZONE · {film['premiere']}</div>
+    </div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">04 · Obsazení</span>
+    <h2>Kdo <span class="accent">hraje</span></h2>
+    <div class="cast-grid">{cast_html}</div>
+    <p style="margin-top:32px;color:var(--text-muted);font-size:14px"><strong style="color:var(--text-primary);font-family:'Cinzel',serif">Režie:</strong> {film['director']} &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Scénář:</strong> {film['writer']} &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Studio:</strong> {film['studio']}</p>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">05 · Zajímavosti</span>
+    <h2>Mezi <span class="accent">řádky</span></h2>
+    <ul class="trivia-list">{trivia_html}</ul>
+  </section>
+
+  <a href="../index.html" class="back-link">← Zpět na úvod</a>
+</div>
+{footer()}"""
+
+    return html_doc(
+        title=f"{film['title']} — KREVZONE.cz",
+        description=f"{film['title']} ({film['year']}) — recenze, trailer, obsazení. {film['director']}, {film['studio']}.",
+        body=body,
+    )
+
+
+# ============================================================================
+# ROZBOR (WEEK) PAGE
+# ============================================================================
+
+def render_rozbor_page(rozbor: dict) -> str:
+    """Render a single weekly batch overview page."""
+    week = rozbor["week"]
+    films = rozbor["films"]
+
+    films_grid = "\n      ".join(render_film_card(f, week, root="../..") for f in films)
+    trailers_grid = "\n      ".join(render_trailer_card(f, week, root="../..") for f in films)
+
+    body = f"""{utility_bar(rozbor['week_label'])}
+{header("rozbory", root="../..")}
+
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="../../index.html">Domů</a><span class="breadcrumb-sep">/</span>
+    <a href="../index.html">Rozbory</a><span class="breadcrumb-sep">/</span>
+    <span>{week}</span>
+  </nav>
+
+  <section style="padding:60px 0 40px">
+    <span class="section-label">Týdenní rozbor · {rozbor['week_label']}</span>
+    <h1 style="font-family:'Cinzel',serif;font-weight:800;font-size:clamp(48px,7vw,84px);line-height:1;color:var(--text-primary);margin-bottom:24px">{rozbor['title']}</h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--text-body);max-width:780px;line-height:1.5">{rozbor['intro']}</p>
+  </section>
+
+  <section id="filmy" class="film-section">
+    <span class="film-section-label">Filmy · {len(films)}</span>
+    <h2>V tomhle <span class="accent">balíku</span></h2>
+    <div class="films-grid">
+      {films_grid}
+    </div>
+  </section>
+
+  <section id="trailery" class="film-section">
+    <span class="film-section-label">Trailery</span>
+    <h2>Lokální <span class="accent">přehrávač</span></h2>
+    <div class="trailers-grid">
+      {trailers_grid}
+    </div>
+  </section>
+
+  <a href="../../index.html" class="back-link">← Zpět na úvod KREVZONE</a>
+</div>
+{footer()}"""
+
+    return html_doc(
+        title=f"{rozbor['title']} — KREVZONE.cz",
+        description=rozbor["subtitle"],
+        body=body,
+    )
+
+
+# ============================================================================
+# ROZBORY ARCHIVE PAGE
+# ============================================================================
+
+def render_rozbory_archive(rozbory: list) -> str:
+    cards = "\n      ".join(render_rozbor_card(r, root="..") for r in rozbory)
+    body = f"""{utility_bar("Archiv rozborů")}
+{header("rozbory", root="..")}
+
+<div class="container">
+  <section style="padding:60px 0 40px">
+    <span class="section-label">Archiv · {len(rozbory)} týdnů</span>
+    <h1 style="font-family:'Cinzel',serif;font-weight:800;font-size:clamp(48px,7vw,84px);line-height:1;color:var(--text-primary);margin-bottom:24px">Týdenní <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)">rozbory</span></h1>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--text-body);max-width:680px;line-height:1.5">Každý týden nový balík hororů — plakáty, trailery, recenze. Vše stahováno a sestaveno automatickou rutinou <code>tydennirozbor</code>.</p>
+  </section>
+
+  <section style="padding:40px 0">
+    <div class="rozbory-grid">
+      {cards}
+    </div>
+  </section>
+
+  <a href="../index.html" class="back-link">← Zpět na úvod</a>
+</div>
+{footer()}"""
+
+    return html_doc(
+        title="Týdenní rozbory — KREVZONE.cz",
+        description="Archiv týdenních horor rozborů. Plakáty, trailery, recenze.",
+        body=body,
+    )
+
+
+# ============================================================================
+# HOMEPAGE
+# ============================================================================
+
+def render_homepage(rozbory: list, all_films: list) -> str:
+    latest = rozbory[0]
+    latest_week = latest["week"]
+
+    # Stats
+    total_films = sum(len(r["films"]) for r in rozbory)
+    total_trailers = sum(1 for r in rozbory for f in r["films"] if f["trailer"])
+    upcoming = sum(1 for f in all_films if f["status"] == "upcoming")
+
+    rozbory_cards = "\n      ".join(render_rozbor_card(r, root=".") for r in rozbory[:6])
+
+    # Top 10 — highest rated from all films, fall back to most recent
+    rated = [f for f in all_films if f["rating"].replace(".", "").isdigit()]
+    rated.sort(key=lambda f: -float(f["rating"]))
+    top10_rows = "\n      ".join(
+        render_top10_row(f, i + 1, root=".") for i, (f, _) in enumerate(
+            [(f, latest_week) for f in rated[:8]]
+        )
+    )
+
+    # Katalog — latest week's films
+    katalog_cards = "\n      ".join(render_film_card(f, latest_week, root=".") for f in latest["films"])
+
+    # Trailery — latest week's trailers
+    trailer_cards = "\n      ".join(render_trailer_card(f, latest_week, root=".") for f in latest["films"])
+
+    # Kalendar — all films from all weeks, sorted by premiere date desc
+    sorted_for_cal = sorted(all_films, key=lambda f: f.get("premiere_date", ""), reverse=True)
+    # Each film gets attached its week for asset paths
+    kalendar_rows_html = "\n      ".join(
+        render_kalendar_row(f, f["_week"], root=".") for f in sorted_for_cal
+    )
+
+    body = f"""{utility_bar(latest['week_label'])}
+{header("rozbory")}
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Český hororový magazín · 2026</div>
+    <h1 class="hero-title">Něco se <span class="accent">probouzí</span><br>ve tmě</h1>
+    <p class="hero-tagline">Filmy, které vás drží vzhůru. Recenze, které říkají proč. Nezávislý český zdroj pro lidi, kteří se hororu nebojí — naopak, čekají na něj.</p>
+    <div class="hero-cta-row">
+      <a href="#rozbory" class="hero-cta hero-cta-primary">Nejnovější týden →</a>
+      <a href="#kalendar" class="hero-cta hero-cta-ghost">Kalendář premiér</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">{len(rozbory)}</div><div class="hero-stat-label">Týdenní rozbory</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{total_films}</div><div class="hero-stat-label">Filmů celkem</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{total_trailers}</div><div class="hero-stat-label">Trailerů</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{upcoming}</div><div class="hero-stat-label">Chystaných premiér</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="rozbory">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-label">Auto · Tydenní rozbory</span>
+        <h2 class="section-title">Nejnovější <span class="accent">balíky</span></h2>
+      </div>
+      <a href="rozbory/index.html" class="section-link">Archiv všech rozborů →</a>
+    </div>
+    <div class="rozbory-grid">
+      {rozbory_cards}
+    </div>
+  </div>
+</section>
+
+<section id="top10" style="background:var(--bg-surface)">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-label">01 · Žebříček</span>
+        <h2 class="section-title">Top 10 podle <span class="accent">hodnocení</span></h2>
+      </div>
+      <p class="section-sub">Sestaveno automaticky napříč všemi rozbory. Nejvyšší skóre nahoře.</p>
+    </div>
+    <div class="top10">
+      {top10_rows}
+    </div>
+  </div>
+</section>
+
+<section id="katalog">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-label">02 · Katalog</span>
+        <h2 class="section-title">Filmy <span class="accent">tento</span> týden</h2>
+      </div>
+      <p class="section-sub">{latest['week_label']} — {len(latest['films'])} filmů. Klikni na plakát pro detail.</p>
+    </div>
+    <div class="films-grid">
+      {katalog_cards}
+    </div>
+  </div>
+</section>
+
+<section id="trailery" style="background:var(--bg-surface)">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-label">03 · Trailery</span>
+        <h2 class="section-title">Lokální <span class="accent">přehrávač</span></h2>
+      </div>
+      <p class="section-sub">Stažené přes yt-dlp. Žádný YouTube, žádné cookies, žádné reklamy.</p>
+    </div>
+    <div class="trailers-grid">
+      {trailer_cards}
+    </div>
+  </div>
+</section>
+
+<section id="kalendar">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-label">04 · Premiéry</span>
+        <h2 class="section-title">Kalendář <span class="accent">premiér</span></h2>
+      </div>
+      <p class="section-sub">Všechny filmy ze všech rozborů, řazené chronologicky.</p>
+    </div>
+    <div class="kalendar">
+      {kalendar_rows_html}
+    </div>
+  </div>
+</section>
+
+{footer()}"""
+
+    return html_doc(
+        title="KREVZONE.cz — Český hororový magazín",
+        description="Nezávislý český magazín o hororu. Recenze, žebříčky, trailery, kalendář premiér. Týdenní rozbory automaticky.",
+        body=body,
+    )
+
+
+# ============================================================================
+# MAIN BUILD
+# ============================================================================
+
+def load_rozbory() -> list:
+    """Load all manifests from rozbory/*/manifest.json, sorted newest first."""
+    rozbory = []
+    for path in sorted(ROZBORY_DIR.glob("*/manifest.json"), reverse=True):
+        with path.open(encoding="utf-8") as f:
+            rozbory.append(json.load(f))
+    return rozbory
+
+
+def main():
+    rozbory = load_rozbory()
+    if not rozbory:
+        print("⚠️  Žádné rozbory v rozbory/*/manifest.json")
+        return
+
+    # Build flat list of all films across all weeks (tagged with _week)
+    seen = {}
+    for r in rozbory:
+        for f in r["films"]:
+            tagged = dict(f, _week=r["week"])
+            if f["slug"] not in seen:
+                seen[f["slug"]] = tagged
+    all_films = list(seen.values())
+
+    FILMY_DIR.mkdir(exist_ok=True)
+    ROZBORY_DIR.mkdir(exist_ok=True)
+
+    # 1. Homepage
+    (ROOT / "index.html").write_text(render_homepage(rozbory, all_films), encoding="utf-8")
+    print(f"  ✓ index.html ({len(rozbory)} rozbor(ů), {len(all_films)} filmů)")
+
+    # 2. Rozbory archive
+    (ROZBORY_DIR / "index.html").write_text(render_rozbory_archive(rozbory), encoding="utf-8")
+    print(f"  ✓ rozbory/index.html")
+
+    # 3. Per-week pages
+    for r in rozbory:
+        out = ROZBORY_DIR / r["week"] / "index.html"
+        out.write_text(render_rozbor_page(r), encoding="utf-8")
+        print(f"  ✓ rozbory/{r['week']}/index.html")
+
+    # 4. Film detail pages — one per unique film
+    for film in all_films:
+        out = FILMY_DIR / f"{film['slug']}.html"
+        out.write_text(render_film_detail(film, film["_week"]), encoding="utf-8")
+        print(f"  ✓ filmy/{film['slug']}.html")
+
+    print(f"\n✅ Hotovo. Otevři: file://{ROOT.resolve()}/index.html")
+
+
+if __name__ == "__main__":
+    main()

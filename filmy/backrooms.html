@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backrooms — KREVZONE.cz</title>
+<meta name="description" content="Backrooms (2026) — recenze, trailer, obsazení. Kane Parsons (Kane Pixels), A24.">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0612'/><text x='50%25' y='65%25' text-anchor='middle' font-family='serif' font-weight='900' font-size='22' fill='%23b465e8'>K</text></svg>">
+<style>
+:root{
+  --bg-void:#0a0612; --bg-base:#120a1f; --bg-surface:#1a1029; --bg-elevated:#241638;
+  --purple-deep:#2d1b4e; --purple-mid:#5b2d8a; --purple-primary:#8b3fbf;
+  --purple-glow:#b465e8; --purple-mist:#d4a3f5;
+  --blood:#8b1538; --blood-bright:#c41e3a; --blood-glow:#ff2d55;
+  --text-primary:#f4ecff; --text-body:#d8c9ee; --text-muted:#9a86b8; --text-faint:#5d4f7a;
+  --border:rgba(139,63,191,0.18); --border-strong:rgba(139,63,191,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-body);font-family:'Inter',system-ui,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.25 0 0 0 0 0.75 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.08;mix-blend-mode:overlay}
+
+/* ====== UTILITY BAR + HEADER ====== */
+.utility-bar{background:var(--bg-void);border-bottom:1px solid var(--border);padding:10px 32px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text-faint);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.utility-bar a{color:var(--text-muted);transition:color 0.2s}
+.utility-bar a:hover{color:var(--purple-glow)}
+.utility-bar-left,.utility-bar-right{display:flex;gap:20px;flex-wrap:wrap}
+.live-dot{color:var(--blood-bright);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(10,6,18,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1400px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.logo{font-family:'Cinzel',serif;font-weight:800;font-size:24px;letter-spacing:0.08em;color:var(--text-primary);display:flex;align-items:center;gap:10px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--purple-glow),var(--blood) 70%);box-shadow:0 0 16px var(--purple-glow)}
+.logo b{background:linear-gradient(180deg,var(--purple-glow),var(--blood-bright));-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:500}
+.nav-menu{display:flex;gap:4px;list-style:none;flex-wrap:wrap}
+.nav-menu a{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;padding:8px 14px;color:var(--text-body);border-radius:6px;transition:all 0.2s}
+.nav-menu a:hover{background:rgba(139,63,191,0.15);color:var(--purple-glow)}
+.nav-menu a.active{background:var(--purple-deep);color:var(--text-primary)}
+.nav-cta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:10px 16px;background:var(--blood);color:var(--text-primary);border-radius:100px;transition:all 0.2s}
+.nav-cta:hover{background:var(--blood-bright);box-shadow:0 0 24px rgba(196,30,58,0.5)}
+
+/* ====== HERO ====== */
+.hero{position:relative;min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;overflow:hidden;background:radial-gradient(ellipse 80% 50% at 50% 30%,rgba(139,63,191,0.28),transparent 70%),radial-gradient(ellipse 60% 40% at 30% 80%,rgba(139,21,56,0.18),transparent 70%),radial-gradient(ellipse 70% 50% at 80% 60%,rgba(91,45,138,0.22),transparent 70%),var(--bg-void)}
+.hero::before{content:'';position:absolute;inset:-20%;z-index:0;background:radial-gradient(circle at 20% 30%,rgba(180,101,232,0.08),transparent 40%),radial-gradient(circle at 70% 70%,rgba(139,63,191,0.06),transparent 40%);animation:mist 20s ease-in-out infinite alternate}
+@keyframes mist{0%{transform:translate(0,0) scale(1)}50%{transform:translate(2%,-2%) scale(1.05)}100%{transform:translate(-2%,2%) scale(1)}}
+.hero-content{position:relative;z-index:2;max-width:920px;animation:fadeUp 1.5s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.5em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:32px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'—';margin:0 16px;color:var(--text-faint)}
+.hero-title{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(56px,11vw,144px);line-height:0.95;color:var(--text-primary);letter-spacing:0.02em;margin-bottom:32px;text-shadow:0 0 40px rgba(139,63,191,0.5),0 0 80px rgba(139,63,191,0.3)}
+.hero-title .accent{color:transparent;background:linear-gradient(180deg,var(--purple-glow) 0%,var(--purple-primary) 70%,var(--blood) 100%);-webkit-background-clip:text;background-clip:text;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:500}
+.hero-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(20px,2.5vw,28px);color:var(--text-body);margin:0 auto 48px;max-width:620px;line-height:1.4}
+.hero-cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border-radius:100px;transition:all 0.3s}
+.hero-cta-primary{background:var(--blood);color:var(--text-primary);box-shadow:0 0 32px rgba(196,30,58,0.4)}
+.hero-cta-primary:hover{background:var(--blood-bright);transform:translateY(-2px);box-shadow:0 8px 40px rgba(196,30,58,0.6)}
+.hero-cta-ghost{background:rgba(26,16,41,0.6);border:1px solid var(--border-strong);color:var(--text-body);backdrop-filter:blur(8px)}
+.hero-cta-ghost:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+.hero-stats{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;padding:24px 32px;background:rgba(26,16,41,0.4);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(8px);max-width:760px;margin:0 auto}
+.hero-stat{text-align:center}
+.hero-stat-num{font-family:'Cinzel',serif;font-weight:700;font-size:36px;color:var(--purple-glow);line-height:1}
+.hero-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-top:8px}
+
+/* ====== SECTION GENERIC ====== */
+.container{max-width:1320px;margin:0 auto;padding:0 32px}
+section{padding:100px 0;position:relative}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:56px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:24px}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;display:block}
+.section-title{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(36px,5vw,56px);color:var(--text-primary);letter-spacing:0.02em;line-height:1.05}
+.section-title .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
+.section-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--text-muted);max-width:420px;text-align:right;line-height:1.4}
+.section-link{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple-glow);padding:10px 18px;border:1px solid var(--border-strong);border-radius:100px;transition:all 0.2s;white-space:nowrap}
+.section-link:hover{background:rgba(139,63,191,0.15);border-color:var(--purple-glow)}
+
+/* ====== ROZBORY (weekly batches grid) ====== */
+.rozbory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:28px}
+.rozbor-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.3s;position:relative;display:flex;flex-direction:column}
+.rozbor-card:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:0 16px 56px rgba(139,63,191,0.18)}
+.rozbor-card-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--bg-void);height:240px}
+.rozbor-card-thumbs img{width:100%;height:100%;object-fit:cover}
+.rozbor-card-body{padding:24px;display:flex;flex-direction:column;gap:12px;flex:1}
+.rozbor-card-week{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--blood-bright)}
+.rozbor-card-title{font-family:'Cinzel',serif;font-weight:700;font-size:24px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.1}
+.rozbor-card-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--text-muted);line-height:1.4}
+.rozbor-card-meta{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint)}
+.rozbor-card-meta strong{color:var(--purple-glow)}
+
+/* ====== TOP 10 ====== */
+.top10{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.top10-row{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:20px;padding:24px 28px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:all 0.2s}
+.top10-row:nth-child(2n){border-right:none}
+.top10-row:hover{background:rgba(139,63,191,0.08);transform:translateX(4px)}
+.top10-rank{font-family:'Cinzel',serif;font-weight:800;font-size:56px;line-height:1;color:var(--purple-glow);-webkit-text-stroke:1px var(--purple-deep)}
+.top10-row:nth-child(-n+3) .top10-rank{background:linear-gradient(180deg,var(--purple-glow),var(--blood));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0}
+.top10-info h3{font-family:'Cinzel',serif;font-weight:600;font-size:18px;color:var(--text-primary);margin-bottom:6px;letter-spacing:0.02em}
+.top10-info p{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase}
+.top10-score{font-family:'Cinzel',serif;font-weight:700;font-size:24px;color:var(--text-primary);background:var(--bg-void);padding:10px 14px;border:1px solid var(--border-strong);border-radius:8px;min-width:64px;text-align:center}
+.top10-score small{display:block;font-size:10px;color:var(--text-faint);font-weight:400;margin-top:2px}
+
+/* ====== FILM CARDS ====== */
+.films-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:28px}
+.film-card{display:block;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.3s ease;position:relative}
+.film-card:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:0 16px 48px rgba(139,63,191,0.2)}
+.film-card-poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(135deg,var(--purple-deep),var(--bg-void))}
+.film-card-poster img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease}
+.film-card:hover .film-card-poster img{transform:scale(1.05)}
+.film-card-badge{position:absolute;top:14px;left:14px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;background:var(--blood);color:var(--text-primary);padding:6px 12px;border-radius:100px}
+.film-card-badge.purple{background:var(--purple-primary)}
+.film-card-rating{position:absolute;top:14px;right:14px;z-index:2;font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:var(--text-primary);background:rgba(10,6,18,0.85);padding:8px 12px;border-radius:8px;backdrop-filter:blur(8px);border:1px solid var(--border-strong)}
+.film-card-body{padding:20px}
+.film-card-genre{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px}
+.film-card-title{font-family:'Cinzel',serif;font-weight:600;font-size:20px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.2;margin-bottom:6px}
+.film-card-meta{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted)}
+
+/* ====== TRAILERY ====== */
+.trailers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:28px}
+.trailer-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.3s}
+.trailer-card:hover{border-color:var(--border-strong);box-shadow:0 12px 40px rgba(139,63,191,0.18)}
+.trailer-video{width:100%;aspect-ratio:16/9;background:#000;display:block}
+.trailer-placeholder{width:100%;aspect-ratio:16/9;display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);border-bottom:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--text-muted);text-align:center;padding:24px;line-height:1.4}
+.trailer-info{padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.trailer-info-title{font-family:'Cinzel',serif;font-weight:600;font-size:16px;color:var(--text-primary);letter-spacing:0.02em}
+.trailer-info-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;margin-top:4px}
+.trailer-detail-btn{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple-glow);padding:8px 12px;border:1px solid var(--border-strong);border-radius:100px;flex-shrink:0;transition:all 0.2s}
+.trailer-detail-btn:hover{background:rgba(139,63,191,0.15);border-color:var(--purple-glow)}
+
+/* ====== KALENDAR ====== */
+.kalendar{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.kalendar-row{display:grid;grid-template-columns:140px 1fr 1fr auto;align-items:center;gap:24px;padding:24px 28px;border-bottom:1px solid var(--border);transition:all 0.2s}
+.kalendar-row:last-child{border-bottom:none}
+.kalendar-row:hover{background:rgba(139,63,191,0.06);transform:translateX(4px)}
+.kalendar-date{font-family:'Cinzel',serif;font-weight:700;font-size:42px;line-height:0.95;color:var(--blood-bright)}
+.kalendar-date small{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;color:var(--text-muted);text-transform:uppercase;margin-top:6px;font-weight:400}
+.kalendar-title{font-family:'Cinzel',serif;font-weight:600;font-size:22px;color:var(--text-primary);letter-spacing:0.02em;line-height:1.1}
+.kalendar-title small{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text-muted);margin-top:6px;letter-spacing:0}
+.kalendar-desc{font-size:14px;color:var(--text-body);line-height:1.5}
+.kalendar-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:8px 14px;border-radius:100px;white-space:nowrap}
+.kalendar-badge.kina{background:var(--blood);color:var(--text-primary)}
+.kalendar-badge.stream{background:var(--purple-primary);color:var(--text-primary)}
+.kalendar-badge.upcoming{background:transparent;border:1px solid var(--purple-glow);color:var(--purple-glow)}
+
+/* ====== FOOTER ====== */
+.footer{background:var(--bg-void);border-top:1px solid var(--border);padding:80px 32px 32px;margin-top:80px}
+.footer-inner{max-width:1320px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand{font-family:'Cinzel',serif;font-weight:800;font-size:32px;color:var(--text-primary);letter-spacing:0.06em;margin-bottom:14px}
+.footer-brand b{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;background:linear-gradient(180deg,var(--purple-glow),var(--blood));-webkit-background-clip:text;background-clip:text;color:transparent}
+.footer-about{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text-muted);line-height:1.6;max-width:380px}
+.footer h4{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:18px}
+.footer ul{list-style:none}
+.footer li{margin-bottom:10px}
+.footer ul a{font-family:'Inter',sans-serif;font-size:14px;color:var(--text-body);transition:color 0.2s}
+.footer ul a:hover{color:var(--purple-glow)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text-faint);text-transform:uppercase}
+
+/* ====== FILM DETAIL ====== */
+.breadcrumb{padding:32px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted)}
+.breadcrumb a{color:var(--purple-glow)}
+.breadcrumb-sep{color:var(--text-faint);margin:0 10px}
+.film-hero{display:grid;grid-template-columns:380px 1fr;gap:64px;padding:60px 0 80px;border-bottom:1px solid var(--border)}
+.film-hero-poster{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 80px rgba(139,63,191,0.2);border:1px solid var(--border-strong)}
+.film-hero-poster img{width:100%;display:block;aspect-ratio:2/3;object-fit:cover}
+.film-hero-info{padding-top:20px}
+.film-genre{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:16px}
+.film-title-big{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(48px,7vw,96px);line-height:0.95;color:var(--text-primary);letter-spacing:0.02em;margin-bottom:12px;text-shadow:0 0 40px rgba(139,63,191,0.4)}
+.film-orig{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--text-muted);margin-bottom:32px}
+.film-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;margin-bottom:32px}
+.film-stat{background:var(--bg-surface);padding:18px 20px}
+.film-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.film-stat-value{font-family:'Cinzel',serif;font-weight:600;font-size:18px;color:var(--text-primary);line-height:1.2}
+.film-stat-value.rating{font-size:28px;color:var(--purple-glow)}
+.film-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.film-tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border-strong);border-radius:100px;color:var(--text-body)}
+.film-actions{display:flex;gap:12px;flex-wrap:wrap}
+.film-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border-radius:100px;transition:all 0.2s}
+.film-btn-primary{background:var(--blood);color:var(--text-primary)}
+.film-btn-primary:hover{background:var(--blood-bright);box-shadow:0 0 24px rgba(196,30,58,0.5)}
+.film-btn-ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text-body)}
+.film-btn-ghost:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+
+.film-section{padding:80px 0;border-bottom:1px solid var(--border)}
+.film-section-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;display:block}
+.film-section h2{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(32px,4vw,52px);color:var(--text-primary);letter-spacing:0.02em;line-height:1.05;margin-bottom:28px}
+.film-section h2 .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
+.film-section p{font-family:'Inter',sans-serif;font-size:17px;line-height:1.75;color:var(--text-body);margin-bottom:18px;max-width:780px}
+.trailer-block{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid var(--border-strong)}
+.trailer-block video{width:100%;height:100%;display:block}
+.trailer-block.empty{display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);text-align:center;padding:40px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--text-muted);line-height:1.4}
+.pullquote{margin:40px 0;padding:32px 40px;border-left:3px solid var(--blood-bright);background:linear-gradient(90deg,rgba(139,21,56,0.08),transparent);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;line-height:1.4;color:var(--text-primary);max-width:820px}
+.review-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:16px;padding:40px;position:relative;margin-top:24px}
+.review-box::before{content:'REC';position:absolute;top:-12px;left:32px;background:var(--blood);color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;padding:4px 12px;border-radius:6px}
+.review-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.review-rating-big{font-family:'Cinzel',serif;font-weight:700;font-size:64px;color:var(--purple-glow);line-height:1}
+.review-rating-big small{display:block;font-size:13px;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-weight:400}
+.review-stars{font-family:monospace;font-size:24px;letter-spacing:6px;color:var(--blood-bright)}
+.review-text{font-family:'Inter',sans-serif;font-size:16px;line-height:1.75;color:var(--text-body)}
+.review-author{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint)}
+.cast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.cast-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:20px;transition:all 0.2s}
+.cast-card:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cast-name{font-family:'Cinzel',serif;font-weight:600;font-size:16px;color:var(--text-primary);margin-bottom:6px;letter-spacing:0.02em}
+.cast-role{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--purple-glow)}
+.trivia-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.trivia-list li{padding:18px 24px;background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--purple-primary);border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;color:var(--text-body)}
+.back-link{display:inline-flex;align-items:center;gap:8px;margin:40px 0;padding:12px 20px;border:1px solid var(--border-strong);border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-body);transition:all 0.2s}
+.back-link:hover{border-color:var(--purple-glow);color:var(--text-primary)}
+
+@media (max-width:960px){
+  .top10{grid-template-columns:1fr}
+  .top10-row{border-right:none !important}
+  .kalendar-row{grid-template-columns:80px 1fr;gap:12px}
+  .kalendar-desc,.kalendar-badge{grid-column:span 2}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .film-hero{grid-template-columns:1fr;gap:32px}
+  .film-hero-poster{max-width:320px;margin:0 auto}
+}
+@media (max-width:640px){
+  .hero{min-height:auto;padding:60px 20px}
+  section{padding:60px 0}
+  .container{padding:0 20px}
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="utility-bar">
+  <div class="utility-bar-left">
+    <span><span class="live-dot">●</span> Detail filmu</span>
+    <span>EDICE LIVE</span>
+  </div>
+  <div class="utility-bar-right">
+    <a href="#">Newsletter</a><a href="#">RSS</a><a href="#">Discord</a>
+  </div>
+</div>
+<header class="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo"><span class="logo-dot"></span>KREV<b>ZONE</b></a>
+    <ul class="nav-menu">
+      <li><a href="../index.html#top10">Top 10</a></li>
+      <li><a href="../index.html#katalog" class="active">Katalog</a></li>
+      <li><a href="../index.html#trailery">Trailery</a></li>
+      <li><a href="../index.html#rozbory">Rozbory</a></li>
+      <li><a href="../index.html#kalendar">Premiéry</a></li>
+    </ul>
+    <a href="#newsletter" class="nav-cta">Newsletter →</a>
+  </div>
+</header>
+
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="../index.html">Domů</a><span class="breadcrumb-sep">/</span>
+    <a href="../index.html#katalog">Katalog</a><span class="breadcrumb-sep">/</span>
+    <span>Backrooms</span>
+  </nav>
+
+  <section class="film-hero">
+    <div class="film-hero-poster">
+      <img src="../rozbory/2026-05-12/posters/Backrooms_poster.jpg" alt="Backrooms">
+    </div>
+    <div class="film-hero-info">
+      <div class="film-genre">Liminal sci-fi · Cosmic horror</div>
+      <h1 class="film-title-big">Backrooms</h1>
+      <div class="film-orig">Backrooms (2026) · USA</div>
+
+      <div class="film-stats">
+        <div class="film-stat"><div class="film-stat-label">Hodnocení</div><div class="film-stat-value rating">A24</div></div>
+        <div class="film-stat"><div class="film-stat-label">Stopáž</div><div class="film-stat-value">120 min</div></div>
+        <div class="film-stat"><div class="film-stat-label">Premiéra</div><div class="film-stat-value">29. května 2026</div></div>
+        <div class="film-stat"><div class="film-stat-label">RT skóre</div><div class="film-stat-value">tba</div></div>
+      </div>
+
+      <div class="film-tags"><span class="film-tag">A24</span>
+        <span class="film-tag">Liminal</span>
+        <span class="film-tag">Dimenze</span>
+        <span class="film-tag">Viral</span></div>
+      <div class="film-actions"><a href="https://www.youtube.com/watch?v=ydfI8oYblp4" target="_blank" class="film-btn film-btn-primary">▶ Trailer na YouTube</a>
+        <a href="https://en.wikipedia.org/wiki/Backrooms_(film)" target="_blank" class="film-btn film-btn-ghost">Wikipedia →</a></div>
+    </div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">01 · Trailer</span>
+    <h2>Oficiální <span class="accent">upoutávka</span></h2>
+    <div class="trailer-block"><video controls preload="metadata" poster="../rozbory/2026-05-12/posters/Backrooms_poster.jpg"><source src="../rozbory/2026-05-12/trailers/BACKROOMS (2026 Movie) ｜ 90s Era Trailer ｜ A24, Kane Pixels.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">02 · Obsah</span>
+    <h2>O <span class="accent">čem</span> to je</h2>
+    <p>Terapeutka Naomi si dlouho neuvědomovala, že její nejtěžší pacient, mladý muž s těžkými epizodami derealizace, popisuje skutečné místo. Když se Eli během sezení doslova rozplyne, Naomi musí přijít na to, jak vstoupit do paralelní dimenze, kde se ztrácejí lidé — žluté chodby, zářivkové světlo, vlhká koberce, nekonečno. A nikdy nejsi sám.</p>
+    <div class="pullquote">„30 000 čtverečních stop kulis. Lidi se v nich opravdu ztráceli."</div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">03 · Recenze</span>
+    <h2>Verdikt <span class="accent">redakce</span></h2>
+    <div class="review-box">
+      <div class="review-header">
+        <div><div class="review-rating-big">A24<small>Feature debut roku</small></div></div>
+        <div class="review-stars">★★★★★★★★☆☆</div>
+      </div>
+      <p class="review-text">Kane Parsons, alias Kane Pixels, byl ve dvaceti letech youtube viral fenomén. A24 mu dal celovečerák, hereckou elitu (Ejiofor, Reinsve, Duplass) a 30 000 ft² fyzických kulis. Buď z toho vyleze nová klasika kosmického hororu, nebo příliš ambiciózně protáhnutý short film. Sázíme na první.</p>
+      <div class="review-author">Martin Š. · Redakce KREVZONE · 29. května 2026</div>
+    </div>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">04 · Obsazení</span>
+    <h2>Kdo <span class="accent">hraje</span></h2>
+    <div class="cast-grid"><div class="cast-card"><div class="cast-name">Chiwetel Ejiofor</div><div class="cast-role">Eli</div></div>
+      <div class="cast-card"><div class="cast-name">Renate Reinsve</div><div class="cast-role">Dr. Naomi Lang</div></div>
+      <div class="cast-card"><div class="cast-name">Mark Duplass</div><div class="cast-role">Marcus</div></div>
+      <div class="cast-card"><div class="cast-name">Finn Bennett</div><div class="cast-role">Owen</div></div>
+      <div class="cast-card"><div class="cast-name">Avan Jogia</div><div class="cast-role">Daniel</div></div></div>
+    <p style="margin-top:32px;color:var(--text-muted);font-size:14px"><strong style="color:var(--text-primary);font-family:'Cinzel',serif">Režie:</strong> Kane Parsons (Kane Pixels) &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Scénář:</strong> Will Soodik, Roberto Patino &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Studio:</strong> A24</p>
+  </section>
+
+  <section class="film-section">
+    <span class="film-section-label">05 · Zajímavosti</span>
+    <h2>Mezi <span class="accent">řádky</span></h2>
+    <ul class="trivia-list"><li>Producent James Wan se k projektu připojil po prvním zhlédnutí Parsonsových YouTube videí.</li>
+      <li>Kulisy byly postaveny v jediném warehouse v Atlantě.</li>
+      <li>Slogan filmu „You are not supposed to be here“ pochází z původního creepypasta z roku 2019.</li>
+      <li>Renate Reinsve (Worst Person in the World) byla castovaná na základě jediného Zoom callu.</li></ul>
+  </section>
+
+  <a href="../index.html" class="back-link">← Zpět na úvod</a>
+</div>
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">KREV<b>ZONE</b></div>
+        <p class="footer-about">Nezávislý český webový magazín o hororovém filmu. Recenze bez kompromisů, žebříčky bez clickbaitu, eseje bez vaty. Praut s.r.o., 2026.</p>
+      </div>
+      <div>
+        <h4>Sekce</h4>
+        <ul>
+          <li><a href="index.html#top10">Top 10</a></li>
+          <li><a href="index.html#katalog">Katalog</a></li>
+          <li><a href="index.html#trailery">Trailery</a></li>
+          <li><a href="index.html#rozbory">Týdenní rozbory</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Žánry</h4>
+        <ul>
+          <li><a href="#">Folk horror</a></li>
+          <li><a href="#">A24 horror</a></li>
+          <li><a href="#">Slasher</a></li>
+          <li><a href="#">Body horror</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Komunita</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RSS feed</a></li>
+          <li><a href="#">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 KREVZONE.cz · Praut s.r.o.</span>
+      <span>Auto-built · V1</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# yt-dlp standalone binary — 35MB, regenerable
+yt-dlp
+yt-dlp.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+.vscode/
+.idea/

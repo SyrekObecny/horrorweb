@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from datetime import date as Date
 
@@ -207,7 +208,7 @@ section{padding:100px 0;position:relative}
 .film-section h2 .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
 .film-section p{font-family:'Inter',sans-serif;font-size:17px;line-height:1.75;color:var(--text-body);margin-bottom:18px;max-width:780px}
 .trailer-block{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid var(--border-strong)}
-.trailer-block video{width:100%;height:100%;display:block}
+.trailer-block video,.trailer-block iframe{width:100%;height:100%;display:block;border:0}
 .trailer-block.empty{display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);text-align:center;padding:40px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--text-muted);line-height:1.4}
 .pullquote{margin:40px 0;padding:32px 40px;border-left:3px solid var(--blood-bright);background:linear-gradient(90deg,rgba(139,21,56,0.08),transparent);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;line-height:1.4;color:var(--text-primary);max-width:820px}
 .review-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:16px;padding:40px;position:relative;margin-top:24px}
@@ -351,6 +352,16 @@ def html_doc(title: str, body: str, description: str = "") -> str:
 # PAGE RENDERERS
 # ============================================================================
 
+def youtube_embed(film: dict, css_class: str = "") -> str:
+    """<iframe> for the film's YouTube trailer, or "" when there is none."""
+    m = re.search(r"(?:v=|youtu\.be/|embed/)([\w-]{11})", film.get("youtube") or "")
+    if not m:
+        return ""
+    cls = f' class="{css_class}"' if css_class else ""
+    return (f'<iframe{cls} src="https://www.youtube-nocookie.com/embed/{m.group(1)}" title="{film["title"]} — trailer" '
+            'loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>')
+
+
 def render_film_card(film: dict, week: str, root: str = ".") -> str:
     """Card linking to film detail (homepage / week page / katalog)."""
     badge_class = " purple" if film["status"] == "stream" else ""
@@ -375,6 +386,8 @@ def render_trailer_card(film: dict, week: str, root: str = ".") -> str:
     if film["trailer"]:
         trailer_path = f"{root}/rozbory/{week}/trailers/{film['trailer']}"
         body = f'<video class="trailer-video" controls preload="metadata" poster="{poster_path}"><source src="{trailer_path}" type="video/mp4"></video>'
+    elif youtube_embed(film):
+        body = youtube_embed(film, "trailer-video")
     else:
         body = f'<div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra {film["premiere"]}.</div>'
     return f"""<div class="trailer-card">
@@ -466,6 +479,8 @@ def render_film_detail(film: dict, week: str) -> str:
 
     if trailer_path:
         trailer_block = f'<div class="trailer-block"><video controls preload="metadata" poster="{poster_path}"><source src="{trailer_path}" type="video/mp4"></video></div>'
+    elif youtube_embed(film):
+        trailer_block = f'<div class="trailer-block">{youtube_embed(film)}</div>'
     else:
         trailer_block = f'<div class="trailer-block empty">⌛ Oficiální trailer zatím nebyl vydán.<br>Premiéra {film["premiere"]}.</div>'
 
@@ -475,6 +490,28 @@ def render_film_detail(film: dict, week: str) -> str:
     )
 
     trivia_html = "\n      ".join(f'<li>{t}</li>' for t in film["trivia"])
+
+    author = "Martin Š." if film.get("review") and not film.get("source") else "AI koncept"
+    review_section = f"""
+  <section class="film-section">
+    <span class="film-section-label">03 · Recenze</span>
+    <h2>Verdikt <span class="accent">redakce</span></h2>
+    <div class="review-box">
+      <div class="review-header">
+        <div><div class="review-rating-big">{film['rating']}<small>{film['rating_label']}</small></div></div>
+        <div class="review-stars">{stars}</div>
+      </div>
+      <p class="review-text">{film['review']}</p>
+      <div class="review-author">{author} · Redakce KREVZONE · {film['premiere']}</div>
+    </div>
+  </section>
+""" if film.get("review") else ""
+    trivia_section = f"""  <section class="film-section">
+    <span class="film-section-label">05 · Zajímavosti</span>
+    <h2>Mezi <span class="accent">řádky</span></h2>
+    <ul class="trivia-list">{trivia_html}</ul>
+  </section>
+""" if film.get("trivia") else ""
 
     body = f"""{utility_bar("Detail filmu")}
 {header("katalog", root="..")}
@@ -517,22 +554,9 @@ def render_film_detail(film: dict, week: str) -> str:
     <span class="film-section-label">02 · Obsah</span>
     <h2>O <span class="accent">čem</span> to je</h2>
     <p>{film['synopsis']}</p>
-    <div class="pullquote">„{film['pullquote']}"</div>
+    {f'<div class="pullquote">„{film["pullquote"]}"</div>' if film.get('pullquote') else ''}
   </section>
-
-  <section class="film-section">
-    <span class="film-section-label">03 · Recenze</span>
-    <h2>Verdikt <span class="accent">redakce</span></h2>
-    <div class="review-box">
-      <div class="review-header">
-        <div><div class="review-rating-big">{film['rating']}<small>{film['rating_label']}</small></div></div>
-        <div class="review-stars">{stars}</div>
-      </div>
-      <p class="review-text">{film['review']}</p>
-      <div class="review-author">Martin Š. · Redakce KREVZONE · {film['premiere']}</div>
-    </div>
-  </section>
-
+{review_section}
   <section class="film-section">
     <span class="film-section-label">04 · Obsazení</span>
     <h2>Kdo <span class="accent">hraje</span></h2>
@@ -540,12 +564,7 @@ def render_film_detail(film: dict, week: str) -> str:
     <p style="margin-top:32px;color:var(--text-muted);font-size:14px"><strong style="color:var(--text-primary);font-family:'Cinzel',serif">Režie:</strong> {film['director']} &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Scénář:</strong> {film['writer']} &nbsp;·&nbsp; <strong style="color:var(--text-primary);font-family:'Cinzel',serif">Studio:</strong> {film['studio']}</p>
   </section>
 
-  <section class="film-section">
-    <span class="film-section-label">05 · Zajímavosti</span>
-    <h2>Mezi <span class="accent">řádky</span></h2>
-    <ul class="trivia-list">{trivia_html}</ul>
-  </section>
-
+{trivia_section}
   <a href="../index.html" class="back-link">← Zpět na úvod</a>
 </div>
 {footer()}"""
@@ -595,7 +614,7 @@ def render_rozbor_page(rozbor: dict) -> str:
 
   <section id="trailery" class="film-section">
     <span class="film-section-label">Trailery</span>
-    <h2>Lokální <span class="accent">přehrávač</span></h2>
+    <h2>Oficiální <span class="accent">upoutávky</span></h2>
     <div class="trailers-grid">
       {trailers_grid}
     </div>
@@ -753,9 +772,9 @@ def render_homepage(rozbory: list, all_films: list) -> str:
     <div class="section-head">
       <div>
         <span class="section-label">03 · Trailery</span>
-        <h2 class="section-title">Lokální <span class="accent">přehrávač</span></h2>
+        <h2 class="section-title">Oficiální <span class="accent">upoutávky</span></h2>
       </div>
-      <p class="section-sub">Stažené přes yt-dlp. Žádný YouTube, žádné cookies, žádné reklamy.</p>
+      <p class="section-sub">Oficiální upoutávky k filmům z nejnovějšího rozboru.</p>
     </div>
     <div class="trailers-grid">
       {trailer_cards}

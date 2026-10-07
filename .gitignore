@@ -14,3 +14,9 @@ __pycache__/
 *.swp
 .vscode/
 .idea/
+
+# Weekly pipeline (local)
+.env
+data/
+media/
+logs/

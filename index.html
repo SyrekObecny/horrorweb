@@ -189,7 +189,7 @@ section{padding:100px 0;position:relative}
 .film-section h2 .accent{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--purple-glow)}
 .film-section p{font-family:'Inter',sans-serif;font-size:17px;line-height:1.75;color:var(--text-body);margin-bottom:18px;max-width:780px}
 .trailer-block{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid var(--border-strong)}
-.trailer-block video{width:100%;height:100%;display:block}
+.trailer-block video,.trailer-block iframe{width:100%;height:100%;display:block;border:0}
 .trailer-block.empty{display:grid;place-content:center;background:repeating-linear-gradient(45deg,rgba(180,101,232,0.05) 0 12px,transparent 12px 24px),var(--bg-void);text-align:center;padding:40px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--text-muted);line-height:1.4}
 .pullquote{margin:40px 0;padding:32px 40px;border-left:3px solid var(--blood-bright);background:linear-gradient(90deg,rgba(139,21,56,0.08),transparent);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;line-height:1.4;color:var(--text-primary);max-width:820px}
 .review-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:16px;padding:40px;position:relative;margin-top:24px}
@@ -230,7 +230,7 @@ section{padding:100px 0;position:relative}
 <body>
 <div class="utility-bar">
   <div class="utility-bar-left">
-    <span><span class="live-dot">●</span> Týden 19 · 2026</span>
+    <span><span class="live-dot">●</span> Týden 41 · 2026</span>
     <span>EDICE LIVE</span>
   </div>
   <div class="utility-bar-right">
@@ -261,10 +261,10 @@ section{padding:100px 0;position:relative}
       <a href="#kalendar" class="hero-cta hero-cta-ghost">Kalendář premiér</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">1</div><div class="hero-stat-label">Týdenní rozbory</div></div>
-      <div class="hero-stat"><div class="hero-stat-num">8</div><div class="hero-stat-label">Filmů celkem</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">2</div><div class="hero-stat-label">Týdenní rozbory</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">19</div><div class="hero-stat-label">Filmů celkem</div></div>
       <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Trailerů</div></div>
-      <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Chystaných premiér</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">9</div><div class="hero-stat-label">Chystaných premiér</div></div>
     </div>
   </div>
 </section>
@@ -279,6 +279,23 @@ section{padding:100px 0;position:relative}
       <a href="rozbory/index.html" class="section-link">Archiv všech rozborů →</a>
     </div>
     <div class="rozbory-grid">
+      <a href="./rozbory/2026-10-05/index.html" class="rozbor-card">
+  <div class="rozbor-card-thumbs">
+    <img src="./rozbory/2026-10-05/posters/the-astronaut.jpg" alt="The Astronaut">
+      <img src="./rozbory/2026-10-05/posters/above-below.jpg" alt="Above & Below">
+      <img src="./rozbory/2026-10-05/posters/red-snow.jpg" alt="Red Snow">
+      <img src="./rozbory/2026-10-05/posters/bunker-heights.jpg" alt="Bunker Heights">
+  </div>
+  <div class="rozbor-card-body">
+    <div class="rozbor-card-week">Týden 41 · 2026</div>
+    <h3 class="rozbor-card-title">Říjen strachu: premiéry hororů na KREVZONE.cz</h3>
+    <div class="rozbor-card-sub">Hope, Other Mommy a The Hole přinášejí lesní monstra, zvrácené matky a historii strachu; brzy Bunker Heights.</div>
+    <div class="rozbor-card-meta">
+      <span><strong>11</strong> filmů</span>
+      <span>Sestavil <strong>KREVZONE bot</strong></span>
+    </div>
+  </div>
+</a>
       <a href="./rozbory/2026-05-12/index.html" class="rozbor-card">
   <div class="rozbor-card-thumbs">
     <img src="./rozbory/2026-05-12/posters/Hokum_poster.jpeg" alt="Hokum">
@@ -326,29 +343,53 @@ section{padding:100px 0;position:relative}
   </div>
   <div class="top10-score">8.8<small>/10</small></div>
 </a>
-      <a href="./filmy/primate.html" class="top10-row">
+      <a href="./filmy/hope.html" class="top10-row">
   <div class="top10-rank">03</div>
+  <div class="top10-info">
+    <h3>Hope</h3>
+    <p>Na Hong-jin · 2026 · thriller · sci-fi</p>
+  </div>
+  <div class="top10-score">8.0<small>/10</small></div>
+</a>
+      <a href="./filmy/resident-evil.html" class="top10-row">
+  <div class="top10-rank">04</div>
+  <div class="top10-info">
+    <h3>Resident Evil</h3>
+    <p>Zach Cregger · 2026 · sci-fi · horor</p>
+  </div>
+  <div class="top10-score">8.0<small>/10</small></div>
+</a>
+      <a href="./filmy/primate.html" class="top10-row">
+  <div class="top10-rank">05</div>
   <div class="top10-info">
     <h3>Primate</h3>
     <p>Johannes Roberts · 2026 · Natural horror · Creature feature</p>
   </div>
   <div class="top10-score">7.8<small>/10</small></div>
 </a>
-      <a href="./filmy/whistle.html" class="top10-row">
-  <div class="top10-rank">04</div>
+      <a href="./filmy/red-snow.html" class="top10-row">
+  <div class="top10-rank">06</div>
   <div class="top10-info">
-    <h3>Whistle</h3>
-    <p>Corin Hardy · 2026 · Supernatural · Curse</p>
+    <h3>Red Snow</h3>
+    <p>Ilja Rautsi · 2026 · hororová komedie · vánoční film</p>
   </div>
-  <div class="top10-score">6.4<small>/10</small></div>
+  <div class="top10-score">7.0<small>/10</small></div>
 </a>
-      <a href="./filmy/the-mummy.html" class="top10-row">
-  <div class="top10-rank">05</div>
+      <a href="./filmy/other-mommy.html" class="top10-row">
+  <div class="top10-rank">07</div>
   <div class="top10-info">
-    <h3>Lee Cronin's The Mummy</h3>
-    <p>Lee Cronin · 2026 · Body horror · Reboot</p>
+    <h3>Other Mommy</h3>
+    <p>Rob Savage · 2026 · nadpřirozený horor</p>
   </div>
-  <div class="top10-score">4.7<small>/10</small></div>
+  <div class="top10-score">7.0<small>/10</small></div>
+</a>
+      <a href="./filmy/the-hole-309-days-to-the-bloodiest-tragedy.html" class="top10-row">
+  <div class="top10-rank">08</div>
+  <div class="top10-info">
+    <h3>The Hole, 309 Days to the Bloodiest Tragedy</h3>
+    <p>Hanung Bramantyo · 2026 · filmový horor · filmový thriller</p>
+  </div>
+  <div class="top10-score">7.0<small>/10</small></div>
 </a>
     </div>
   </div>
@@ -361,103 +402,139 @@ section{padding:100px 0;position:relative}
         <span class="section-label">02 · Katalog</span>
         <h2 class="section-title">Filmy <span class="accent">tento</span> týden</h2>
       </div>
-      <p class="section-sub">Týden 19 · 2026 — 8 filmů. Klikni na plakát pro detail.</p>
+      <p class="section-sub">Týden 41 · 2026 — 11 filmů. Klikni na plakát pro detail.</p>
     </div>
     <div class="films-grid">
-      <a href="./filmy/hokum.html" class="film-card">
+      <a href="./filmy/the-astronaut.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">5.0</span>
+    <img src="./rozbory/2026-10-05/posters/the-astronaut.jpg" alt="The Astronaut">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">sci-fi · horor · 90 min</div>
+    <h3 class="film-card-title">The Astronaut</h3>
+    <div class="film-card-meta">Jess Varley · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/above-below.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">5.0</span>
+    <img src="./rozbory/2026-10-05/posters/above-below.jpg" alt="Above & Below">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">horor · akční film · 96 min</div>
+    <h3 class="film-card-title">Above & Below</h3>
+    <div class="film-card-meta">Jesse V. Johnson · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/red-snow.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">7.0</span>
+    <img src="./rozbory/2026-10-05/posters/red-snow.jpg" alt="Red Snow">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">hororová komedie · vánoční film · —</div>
+    <h3 class="film-card-title">Red Snow</h3>
+    <div class="film-card-meta">Ilja Rautsi · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/bunker-heights.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">6.0</span>
+    <img src="./rozbory/2026-10-05/posters/bunker-heights.jpg" alt="Bunker Heights">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">horor · kriminální komedie · 106 min</div>
+    <h3 class="film-card-title">Bunker Heights</h3>
+    <div class="film-card-meta">Drew Fortier · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/hope.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">8.0</span>
+    <img src="./rozbory/2026-10-05/posters/hope.png" alt="Hope">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">thriller · sci-fi · 157 min</div>
+    <h3 class="film-card-title">Hope</h3>
+    <div class="film-card-meta">Na Hong-jin · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/other-mommy.html" class="film-card">
+  <div class="film-card-poster">
+    <span class="film-card-badge">Brzy</span>
+    <span class="film-card-rating">7.0</span>
+    <img src="./rozbory/2026-10-05/posters/other-mommy.jpg" alt="Other Mommy">
+  </div>
+  <div class="film-card-body">
+    <div class="film-card-genre">nadpřirozený horor · —</div>
+    <h3 class="film-card-title">Other Mommy</h3>
+    <div class="film-card-meta">Rob Savage · 2026</div>
+  </div>
+</a>
+      <a href="./filmy/the-hole-309-days-to-the-bloodiest-tragedy.html" class="film-card">
   <div class="film-card-poster">
     <span class="film-card-badge">V kinech</span>
-    <span class="film-card-rating">8.8</span>
-    <img src="./rozbory/2026-05-12/posters/Hokum_poster.jpeg" alt="Hokum">
+    <span class="film-card-rating">7.0</span>
+    <img src="./rozbory/2026-10-05/posters/the-hole-309-days-to-the-bloodiest-tragedy.png" alt="The Hole, 309 Days to the Bloodiest Tragedy">
   </div>
   <div class="film-card-body">
-    <div class="film-card-genre">Folk horror · Gothic supernatural · 102 min</div>
-    <h3 class="film-card-title">Hokum</h3>
-    <div class="film-card-meta">Damian McCarthy · 2026</div>
+    <div class="film-card-genre">filmový horor · filmový thriller · 99 min</div>
+    <h3 class="film-card-title">The Hole, 309 Days to the Bloodiest Tragedy</h3>
+    <div class="film-card-meta">Hanung Bramantyo · 2026</div>
   </div>
 </a>
-      <a href="./filmy/obsession.html" class="film-card">
-  <div class="film-card-poster">
-    <span class="film-card-badge">Brzy</span>
-    <span class="film-card-rating">TIFF</span>
-    <img src="./rozbory/2026-05-12/posters/Obsession_poster.jpeg" alt="Obsession">
-  </div>
-  <div class="film-card-body">
-    <div class="film-card-genre">Supernatural · Psychological · 108 min</div>
-    <h3 class="film-card-title">Obsession</h3>
-    <div class="film-card-meta">Curry Barker · 2026</div>
-  </div>
-</a>
-      <a href="./filmy/passenger.html" class="film-card">
-  <div class="film-card-poster">
-    <span class="film-card-badge">Brzy</span>
-    <span class="film-card-rating">⸺</span>
-    <img src="./rozbory/2026-05-12/posters/Passenger_poster.jpg" alt="Passenger">
-  </div>
-  <div class="film-card-body">
-    <div class="film-card-genre">Supernatural · Road horror · 110 min</div>
-    <h3 class="film-card-title">Passenger</h3>
-    <div class="film-card-meta">André Øvredal · 2026</div>
-  </div>
-</a>
-      <a href="./filmy/backrooms.html" class="film-card">
-  <div class="film-card-poster">
-    <span class="film-card-badge">Brzy</span>
-    <span class="film-card-rating">A24</span>
-    <img src="./rozbory/2026-05-12/posters/Backrooms_poster.jpg" alt="Backrooms">
-  </div>
-  <div class="film-card-body">
-    <div class="film-card-genre">Liminal sci-fi · Cosmic horror · 120 min</div>
-    <h3 class="film-card-title">Backrooms</h3>
-    <div class="film-card-meta">Kane Parsons (Kane Pixels) · 2026</div>
-  </div>
-</a>
-      <a href="./filmy/the-mummy.html" class="film-card">
+      <a href="./filmy/the-birthday-party.html" class="film-card">
   <div class="film-card-poster">
     <span class="film-card-badge">V kinech</span>
-    <span class="film-card-rating">4.7</span>
-    <img src="./rozbory/2026-05-12/posters/Lee_Cronins_The_Mummy_poster.jpg" alt="Lee Cronin's The Mummy">
+    <span class="film-card-rating">6.0</span>
+    <img src="./rozbory/2026-10-05/posters/the-birthday-party.jpg" alt="The Birthday Party">
   </div>
   <div class="film-card-body">
-    <div class="film-card-genre">Body horror · Reboot · 119 min</div>
-    <h3 class="film-card-title">Lee Cronin's The Mummy</h3>
-    <div class="film-card-meta">Lee Cronin · 2026</div>
+    <div class="film-card-genre">filmové drama · filmový horor · —</div>
+    <h3 class="film-card-title">The Birthday Party</h3>
+    <div class="film-card-meta">Léa Mysius · 2026</div>
   </div>
 </a>
-      <a href="./filmy/send-help.html" class="film-card">
+      <a href="./filmy/resident-evil.html" class="film-card">
   <div class="film-card-poster">
-    <span class="film-card-badge purple">Stream</span>
-    <span class="film-card-rating">9.3</span>
-    <img src="./rozbory/2026-05-12/posters/Send_Help_poster.jpg" alt="Send Help">
+    <span class="film-card-badge">V kinech</span>
+    <span class="film-card-rating">8.0</span>
+    <img src="./rozbory/2026-10-05/posters/resident-evil.png" alt="Resident Evil">
   </div>
   <div class="film-card-body">
-    <div class="film-card-genre">Survival · Černá komedie · 98 min</div>
-    <h3 class="film-card-title">Send Help</h3>
-    <div class="film-card-meta">Sam Raimi · 2026</div>
+    <div class="film-card-genre">sci-fi · horor · 95 min</div>
+    <h3 class="film-card-title">Resident Evil</h3>
+    <div class="film-card-meta">Zach Cregger · 2026</div>
   </div>
 </a>
-      <a href="./filmy/primate.html" class="film-card">
+      <a href="./filmy/the-last-kiss.html" class="film-card">
   <div class="film-card-poster">
     <span class="film-card-badge purple">Stream</span>
-    <span class="film-card-rating">7.8</span>
-    <img src="./rozbory/2026-05-12/posters/Primate_poster.jpg" alt="Primate">
+    <span class="film-card-rating">6.0</span>
+    <img src="./rozbory/2026-10-05/posters/the-last-kiss.png" alt="The Last Kiss">
   </div>
   <div class="film-card-body">
-    <div class="film-card-genre">Natural horror · Creature feature · 89 min</div>
-    <h3 class="film-card-title">Primate</h3>
-    <div class="film-card-meta">Johannes Roberts · 2026</div>
+    <div class="film-card-genre">slasher · —</div>
+    <h3 class="film-card-title">The Last Kiss</h3>
+    <div class="film-card-meta">Yoko Okumura · 2026</div>
   </div>
 </a>
-      <a href="./filmy/whistle.html" class="film-card">
+      <a href="./filmy/onslaught.html" class="film-card">
   <div class="film-card-poster">
-    <span class="film-card-badge purple">Stream</span>
-    <span class="film-card-rating">6.4</span>
-    <img src="./rozbory/2026-05-12/posters/Whistle_poster.jpg" alt="Whistle">
+    <span class="film-card-badge">V kinech</span>
+    <span class="film-card-rating">6.0</span>
+    <img src="./rozbory/2026-10-05/posters/onslaught.jpg" alt="Onslaught">
   </div>
   <div class="film-card-body">
-    <div class="film-card-genre">Supernatural · Curse · 102 min</div>
-    <h3 class="film-card-title">Whistle</h3>
-    <div class="film-card-meta">Corin Hardy · 2026</div>
+    <div class="film-card-genre">horor · akční thriller · —</div>
+    <h3 class="film-card-title">Onslaught</h3>
+    <div class="film-card-meta">Adam Wingard · 2026</div>
   </div>
 </a>
     </div>
@@ -469,89 +546,119 @@ section{padding:100px 0;position:relative}
     <div class="section-head">
       <div>
         <span class="section-label">03 · Trailery</span>
-        <h2 class="section-title">Lokální <span class="accent">přehrávač</span></h2>
+        <h2 class="section-title">Oficiální <span class="accent">upoutávky</span></h2>
       </div>
-      <p class="section-sub">Stažené přes yt-dlp. Žádný YouTube, žádné cookies, žádné reklamy.</p>
+      <p class="section-sub">Oficiální upoutávky k filmům z nejnovějšího rozboru.</p>
     </div>
     <div class="trailers-grid">
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Hokum_poster.jpeg"><source src="./rozbory/2026-05-12/trailers/HOKUM - Final Trailer - Only In Theaters May 1.mp4" type="video/mp4"></video>
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 3. prosince 2026.</div>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Hokum</div>
-      <div class="trailer-info-meta">NEON · 1. května 2026</div>
+      <div class="trailer-info-title">The Astronaut</div>
+      <div class="trailer-info-meta">ADS Service · 3. prosince 2026</div>
     </div>
-    <a href="./filmy/hokum.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/the-astronaut.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 15. května 2026.</div>
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 3. prosince 2026.</div>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Obsession</div>
-      <div class="trailer-info-meta">Focus Features · 15. května 2026</div>
+      <div class="trailer-info-title">Above & Below</div>
+      <div class="trailer-info-meta">— · 3. prosince 2026</div>
     </div>
-    <a href="./filmy/obsession.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/above-below.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Passenger_poster.jpg"><source src="./rozbory/2026-05-12/trailers/Passenger ｜ Official Trailer (2026 Movie) – André Øvredal, Jacob Scipio, Lou Llo.mp4" type="video/mp4"></video>
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 20. listopadu 2026.</div>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Passenger</div>
-      <div class="trailer-info-meta">Paramount Pictures · 22. května 2026</div>
+      <div class="trailer-info-title">Red Snow</div>
+      <div class="trailer-info-meta">— · 20. listopadu 2026</div>
     </div>
-    <a href="./filmy/passenger.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/red-snow.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Backrooms_poster.jpg"><source src="./rozbory/2026-05-12/trailers/BACKROOMS (2026 Movie) ｜ 90s Era Trailer ｜ A24, Kane Pixels.mp4" type="video/mp4"></video>
+  <iframe class="trailer-video" src="https://www.youtube-nocookie.com/embed/YMcauPBDuKM" title="Bunker Heights — trailer" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Backrooms</div>
-      <div class="trailer-info-meta">A24 · 29. května 2026</div>
+      <div class="trailer-info-title">Bunker Heights</div>
+      <div class="trailer-info-meta">Bellini Industries · 13. října 2026</div>
     </div>
-    <a href="./filmy/backrooms.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/bunker-heights.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Lee_Cronins_The_Mummy_poster.jpg"><source src="./rozbory/2026-05-12/trailers/Lee Cronin's The Mummy ｜ Official Trailer.mp4" type="video/mp4"></video>
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 8. října 2026.</div>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Lee Cronin's The Mummy</div>
-      <div class="trailer-info-meta">Blumhouse · Atomic Monster · New Line · 17. dubna 2026</div>
+      <div class="trailer-info-title">Hope</div>
+      <div class="trailer-info-meta">West World Story · 8. října 2026</div>
     </div>
-    <a href="./filmy/the-mummy.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/hope.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Send_Help_poster.jpg"><source src="./rozbory/2026-05-12/trailers/Send Help ｜ Official Trailer ｜ In Theaters Jan 30.mp4" type="video/mp4"></video>
+  <iframe class="trailer-video" src="https://www.youtube-nocookie.com/embed/bEpTgowZ1dI" title="Other Mommy — trailer" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Send Help</div>
-      <div class="trailer-info-meta">20th Century Studios · 30. ledna 2026</div>
+      <div class="trailer-info-title">Other Mommy</div>
+      <div class="trailer-info-meta">Atomic Monster, Blumhouse Productions · 8. října 2026</div>
     </div>
-    <a href="./filmy/send-help.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/other-mommy.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Primate_poster.jpg"><source src="./rozbory/2026-05-12/trailers/Primate (2026) ｜ Official Trailer ｜ Paramount Pictures.mp4" type="video/mp4"></video>
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 1. října 2026.</div>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Primate</div>
-      <div class="trailer-info-meta">Paramount Pictures · 9. ledna 2026</div>
+      <div class="trailer-info-title">The Hole, 309 Days to the Bloodiest Tragedy</div>
+      <div class="trailer-info-meta">Dapur Film · 1. října 2026</div>
     </div>
-    <a href="./filmy/primate.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/the-hole-309-days-to-the-bloodiest-tragedy.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
       <div class="trailer-card">
-  <video class="trailer-video" controls preload="metadata" poster="./rozbory/2026-05-12/posters/Whistle_poster.jpg"><source src="./rozbory/2026-05-12/trailers/WHISTLE (2026) Official Trailer (HD) SUPERNATURAL ｜ Corin Hardy, Dafne Keen, Nic.mp4" type="video/mp4"></video>
+  <iframe class="trailer-video" src="https://www.youtube-nocookie.com/embed/m5yA7RlZssA" title="The Birthday Party — trailer" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
   <div class="trailer-info">
     <div>
-      <div class="trailer-info-title">Whistle</div>
-      <div class="trailer-info-meta">IFC Films · Shudder · 6. února 2026</div>
+      <div class="trailer-info-title">The Birthday Party</div>
+      <div class="trailer-info-meta">Le Pacte · 16. září 2026</div>
     </div>
-    <a href="./filmy/whistle.html" class="trailer-detail-btn">Detail →</a>
+    <a href="./filmy/the-birthday-party.html" class="trailer-detail-btn">Detail →</a>
+  </div>
+</div>
+      <div class="trailer-card">
+  <iframe class="trailer-video" src="https://www.youtube-nocookie.com/embed/SJPu1spHqfk" title="Resident Evil — trailer" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  <div class="trailer-info">
+    <div>
+      <div class="trailer-info-title">Resident Evil</div>
+      <div class="trailer-info-meta">Columbia Pictures, Constantin Film · 15. září 2026</div>
+    </div>
+    <a href="./filmy/resident-evil.html" class="trailer-detail-btn">Detail →</a>
+  </div>
+</div>
+      <div class="trailer-card">
+  <div class="trailer-placeholder">⌛ Oficiální trailer ještě nebyl vydán.<br><br>Premiéra 15. září 2026.</div>
+  <div class="trailer-info">
+    <div>
+      <div class="trailer-info-title">The Last Kiss</div>
+      <div class="trailer-info-meta">— · 15. září 2026</div>
+    </div>
+    <a href="./filmy/the-last-kiss.html" class="trailer-detail-btn">Detail →</a>
+  </div>
+</div>
+      <div class="trailer-card">
+  <iframe class="trailer-video" src="https://www.youtube-nocookie.com/embed/L24CYVpQ-LI" title="Onslaught — trailer" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  <div class="trailer-info">
+    <div>
+      <div class="trailer-info-title">Onslaught</div>
+      <div class="trailer-info-meta">A24 · 3. září 2026</div>
+    </div>
+    <a href="./filmy/onslaught.html" class="trailer-detail-btn">Detail →</a>
   </div>
 </div>
     </div>
@@ -568,6 +675,94 @@ section{padding:100px 0;position:relative}
       <p class="section-sub">Všechny filmy ze všech rozborů, řazené chronologicky.</p>
     </div>
     <div class="kalendar">
+      <a href="./filmy/the-astronaut.html" class="kalendar-row">
+  <div class="kalendar-date">03<small>Prosinec</small></div>
+  <div>
+    <div class="kalendar-title">The Astronaut<small>Jess Varley · ADS Service · 90 min</small></div>
+  </div>
+  <div class="kalendar-desc">Mimozemská tajemství se vynořují z lesů a z nitra lidské duše.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/above-below.html" class="kalendar-row">
+  <div class="kalendar-date">03<small>Prosinec</small></div>
+  <div>
+    <div class="kalendar-title">Above & Below<small>Jesse V. Johnson · — · 96 min</small></div>
+  </div>
+  <div class="kalendar-desc">Napětí střídá hluboká voda a smrtící kartel – strach přichází ze všech stran.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/red-snow.html" class="kalendar-row">
+  <div class="kalendar-date">20<small>Listopad</small></div>
+  <div>
+    <div class="kalendar-title">Red Snow<small>Ilja Rautsi · — · —</small></div>
+  </div>
+  <div class="kalendar-desc">Santovský upír, který rozesměje i vyděsí.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/bunker-heights.html" class="kalendar-row">
+  <div class="kalendar-date">13<small>Říjen</small></div>
+  <div>
+    <div class="kalendar-title">Bunker Heights<small>Drew Fortier · Bellini Industries · 106 min</small></div>
+  </div>
+  <div class="kalendar-desc">Když korupce sahá do podzemí, strach nemá kde se schovat.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/hope.html" class="kalendar-row">
+  <div class="kalendar-date">08<small>Říjen</small></div>
+  <div>
+    <div class="kalendar-title">Hope<small>Na Hong-jin · West World Story · 157 min</small></div>
+  </div>
+  <div class="kalendar-desc">Monstrum z lesů odhalí lidskou slabost i odhodlání.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/other-mommy.html" class="kalendar-row">
+  <div class="kalendar-date">08<small>Říjen</small></div>
+  <div>
+    <div class="kalendar-title">Other Mommy<small>Rob Savage · Atomic Monster, Blumhouse Productions · —</small></div>
+  </div>
+  <div class="kalendar-desc">Když se vaše matka stane vaším největším strachem.</div>
+  <span class="kalendar-badge upcoming">Chystá se</span>
+</a>
+      <a href="./filmy/the-hole-309-days-to-the-bloodiest-tragedy.html" class="kalendar-row">
+  <div class="kalendar-date">01<small>Říjen</small></div>
+  <div>
+    <div class="kalendar-title">The Hole, 309 Days to the Bloodiest Tragedy<small>Hanung Bramantyo · Dapur Film · 99 min</small></div>
+  </div>
+  <div class="kalendar-desc">Když historie šeptá, stěny plní díry strachu.</div>
+  <span class="kalendar-badge kina">V kinech</span>
+</a>
+      <a href="./filmy/the-birthday-party.html" class="kalendar-row">
+  <div class="kalendar-date">16<small>Září</small></div>
+  <div>
+    <div class="kalendar-title">The Birthday Party<small>Léa Mysius · Le Pacte · —</small></div>
+  </div>
+  <div class="kalendar-desc">Narozeninová oslava se změní v noční můru na zapomenutém břehu.</div>
+  <span class="kalendar-badge kina">V kinech</span>
+</a>
+      <a href="./filmy/resident-evil.html" class="kalendar-row">
+  <div class="kalendar-date">15<small>Září</small></div>
+  <div>
+    <div class="kalendar-title">Resident Evil<small>Zach Cregger · Columbia Pictures, Constantin Film · 95 min</small></div>
+  </div>
+  <div class="kalendar-desc">Kurýr proti nemoci: boj o balík, který může zachránit svět.</div>
+  <span class="kalendar-badge kina">V kinech</span>
+</a>
+      <a href="./filmy/the-last-kiss.html" class="kalendar-row">
+  <div class="kalendar-date">15<small>Září</small></div>
+  <div>
+    <div class="kalendar-title">The Last Kiss<small>Yoko Okumura · — · —</small></div>
+  </div>
+  <div class="kalendar-desc">Když polibek odhalí vraždu, čas běží zpět.</div>
+  <span class="kalendar-badge stream">Stream</span>
+</a>
+      <a href="./filmy/onslaught.html" class="kalendar-row">
+  <div class="kalendar-date">03<small>Září</small></div>
+  <div>
+    <div class="kalendar-title">Onslaught<small>Adam Wingard · A24 · —</small></div>
+  </div>
+  <div class="kalendar-desc">Supervojáci prchají z laboratoře, ale střelkyně je zná z varlat.</div>
+  <span class="kalendar-badge kina">V kinech</span>
+</a>
       <a href="./filmy/backrooms.html" class="kalendar-row">
   <div class="kalendar-date">29<small>Květen</small></div>
   <div>
